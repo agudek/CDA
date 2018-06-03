@@ -28,7 +28,7 @@ x = range(len(data1[data1.columns[0]]))
 
 
 
-for i,col in enumerate(data1[columns]):
+for i,col in enumerate(columns):
     axarr[i].plot(x, data1[col])
     axarr[i].legend([col],loc=2, prop={'size': 6}, handlelength=1)
     axarr[i].axes.get_xaxis().set_visible(False)
