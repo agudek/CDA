@@ -34,5 +34,5 @@ To run the code, several requirements need to be met. All used code is written i
 - Statsmodels
 - Plotly
 
-All libraries can be install using ``pip3```.
+All libraries can be install using ```pip3```.
 
