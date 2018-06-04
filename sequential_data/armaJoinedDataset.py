@@ -1,14 +1,49 @@
-from datetime import  timedelta
-from sklearn.metrics import accuracy_score, recall_score, classification_report, confusion_matrix
+from datetime import timedelta
 from pandas import datetime
 import statistics as st
 import pandas as pd
-from matplotlib import pyplot
 from statsmodels.tsa.stattools import arma_order_select_ic
-
 from statsmodels.tsa.arima_model import ARMA
 from sklearn.metrics import mean_squared_error
 import numpy as np
+import matplotlib.pyplot as plt
+
+
+def plot_arma(column_name, dates, y, ypred, std, mean):
+    day_before = dates[0] - timedelta(days=10)
+    last_day = dates[-1] - timedelta(days=10)
+
+    upperbound = mean + (3 * std)
+    lowerbound = mean - (3 * std)
+
+    plt.axhline(y=(upperbound), color='red')
+    plt.axhline(y=(lowerbound), color='red')
+
+    plt.xlim(day_before, last_day)
+
+    plt.plot(dates, y)
+    plt.plot(dates, ypred)
+    plt.xlabel("Date")
+    plt.ylabel(column_name)
+    plt.legend(loc="lower right")
+    plt.savefig("armaResults/Anomaly%s" % column_name)
+    plt.close()
+
+
+def plot_residual(column_name, dates, residuals):
+    residuals = pd.DataFrame(residuals)
+    residuals.plot()
+    plt.savefig("armaResults/Residual%s" % column_name)
+    plt.close()
+
+    residuals.plot(kind='kde')
+    plt.savefig("armaResults/Density%s" % column_name)
+    plt.close()
+    print(residuals.describe())
+
+
+def parser(x):
+    return datetime.strptime(x, '%d/%m/%y %H')
 
 
 def predict(coef, history):
@@ -25,38 +60,6 @@ def difference(dataset):
         diff.append(value)
     return np.array(diff)
 
-def parser(x):
-    return datetime.strptime(x, '%d/%m/%y %H')
-
-def plot_arma(column_name, dates, y, std, mean):
-    day_before = dates[0] - timedelta(days=10)
-    last_day = dates[-1] - timedelta(days=10)
-
-    upperbound = mean + (3 * std)
-    lowerbound = mean - (3 * std)
-
-    pyplot.axhline(y=(upperbound*1.25), color='red')
-    pyplot.axhline(y=(lowerbound - 1.25), color='red')
-
-    pyplot.xlim(day_before, last_day)
-
-    pyplot.plot(dates, y)
-    pyplot.xlabel("Date")
-    pyplot.ylabel(column_name)
-    pyplot.savefig("armaResults/Anomaly%s" % column_name)
-    pyplot.close()
-
-
-def plot_residual(column_name, dates, residuals):
-    residuals = pd.DataFrame(residuals)
-    residuals.plot()
-    pyplot.savefig("armaResults/Residual%s" % column_name)
-    pyplot.close()
-
-    residuals.plot(kind='kde')
-    pyplot.savefig("armaResults/Density%s" % column_name)
-    pyplot.close()
-    print(residuals.describe())
 
 def aic(dataset, columns):
     aic_orders = {}
@@ -69,9 +72,6 @@ def aic(dataset, columns):
 
 train_data1 = pd.read_csv("BATADAL_dataset03.csv", header=0, parse_dates=[0], index_col=None, squeeze=True, date_parser=parser)
 train_data2 = pd.read_csv("BATADAL_dataset04.csv", header=0, parse_dates=[0], index_col=None, squeeze=True, date_parser=parser)
-
-print(train_data1.columns)
-print(train_data2.columns)
 
 columns = train_data1.columns[[1, 2, 3, 4, 5, 6, 7]]
 aic_orders = aic(train_data1, columns)
@@ -111,8 +111,6 @@ for c in columns:
 
     train_dates = [x for x in train_data1['DATETIME']]
 
-    plot_arma(c, dates, predictions[c], standard_deviation, mean)
+    plot_arma(c, dates, predictions[c], test_data_values, standard_deviation, mean)
     plot_residual(c, train_dates, model_fit.resid)
-
-
 
