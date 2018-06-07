@@ -8,7 +8,7 @@ from sklearn.metrics import mean_squared_error
 import numpy as np
 import matplotlib.pyplot as plt
 
-
+'''Plot Arma results for detected anomalies'''
 def plot_arma(column_name, dates, y, ypred, std, mean):
     day_before = dates[0] - timedelta(days=10)
     last_day = dates[-1] - timedelta(days=10)
@@ -29,7 +29,7 @@ def plot_arma(column_name, dates, y, ypred, std, mean):
     plt.savefig("armaResults/Anomaly%s" % column_name)
     plt.close()
 
-
+'''Plot arma residuals and densities'''
 def plot_residual(column_name, dates, residuals):
     residuals = pd.DataFrame(residuals)
     residuals.plot()
@@ -41,7 +41,7 @@ def plot_residual(column_name, dates, residuals):
     plt.close()
     print(residuals.describe())
 
-
+'''Parse datatime'''
 def parser(x):
     return datetime.strptime(x, '%d/%m/%y %H')
 
@@ -52,7 +52,8 @@ def predict(coef, history):
         yhat += coef[i - 1] * history[-i]
     return yhat
 
-
+'''Get the difference between the present value in dataset and the previous
+Return and array of these differences'''
 def difference(dataset):
     diff = list()
     for i in range(1, len(dataset)):
@@ -60,7 +61,8 @@ def difference(dataset):
         diff.append(value)
     return np.array(diff)
 
-
+'''Calculate the best p and q orders for all columns in dataset with the 
+minimum aic values. Return the p and q orders per column'''
 def aic(dataset, columns):
     aic_orders = {}
 
@@ -69,13 +71,43 @@ def aic(dataset, columns):
         order_selection = arma_order_select_ic(column.values, max_ar = 4, max_ma = 2, ic = "aic")
         aic_orders[column_name] = order_selection.aic_min_order
     return aic_orders
+'''Calculate statistics for ARMA'''
+# '''Calculate statistics for ARMA'''
+# def overlap_results(attack_flags, predictions, bounds, columns):
+#     true_positive = false_negative = number_of_attacks = 0
+#
+#     for i in range(5, len(attack_flags)):
+#         if int(attack_flags[i]) == 1:
+#             number_of_attacks = number_of_attacks + 1
+#
+#             registered = False
+#             for column in columns:
+#                 lowerbound, upperbound = bounds[column]
+#                 if predictions[column][i] < lowerbound or predictions[column][i] > upperbound:
+#                     true_positive = true_positive + 1
+#                     registered = True
+#                     break
+#             if not registered:
+#                 false_negative = false_negative + 1
+#     print("false_negative = %s " % false_negative)
+#     print("true_positive = %s" % true_positive)
+#     print("number_of_attacks = %s" % number_of_attacks)
 
+'''Load data'''
 train_data1 = pd.read_csv("BATADAL_dataset03.csv", header=0, parse_dates=[0], index_col=None, squeeze=True, date_parser=parser)
 train_data2 = pd.read_csv("BATADAL_dataset04.csv", header=0, parse_dates=[0], index_col=None, squeeze=True, date_parser=parser)
 
+'''Specify columns to be used'''
 columns = train_data1.columns[[1, 2, 3, 4, 5, 6, 7]]
+
+'''Calculate aic orders for the specified columns'''
 aic_orders = aic(train_data1, columns)
 predictions = {}
+bounds = {}
+
+'''Per column in dataset, split data into test and training sets, calculate means and standard deviations
+fit Arma model with training data only, and carry out predictions based on 
+difference between the current and previous values'''
 
 for c in columns:
     test_column_name = c
@@ -102,6 +134,11 @@ for c in columns:
         predictions[c].append(yhat)
         obs = test_data_values[t]
         history.append(obs)
+
+    '''Set upper and lower bounds and calculate mse and rmse values'''
+    upperbound = mean + (3 * standard_deviation)
+    lowerbound = mean - (3 * standard_deviation)
+    bounds[c] = (lowerbound, upperbound)
     mse = mean_squared_error(test_data_values, predictions[c])
     rmse = np.sqrt(mse)
     print('Test RMSE: %.3f for column %s' % (rmse, c))
@@ -111,6 +148,9 @@ for c in columns:
 
     train_dates = [x for x in train_data1['DATETIME']]
 
+    '''Plot Arma'''
     plot_arma(c, dates, predictions[c], test_data_values, standard_deviation, mean)
     plot_residual(c, train_dates, model_fit.resid)
+    # overlap_results(train_data1['ATT_FLAG'], predictions, bounds, c)
+
 
