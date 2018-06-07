@@ -2,6 +2,7 @@ Sequential data
 ---
 
 The visualisations in the report were created using ```dataviz.py``` and ```datavis_attacks.py```
+```plotting.py``` shows the correlation between columns in the dataset.
 
 ---
 
@@ -10,6 +11,13 @@ Simple time series prediction using sliding windows can be found in ```sliding_w
 ---
 
 ARMA can be found in ```armaSingleDataset.py``` and ```armaJoinedDataset.py```
+```armaSingleDataset.py``` contains arma performed on just Batadal Training set 1 which
+does not show any interesting results because of the lack of attacks. This was done to
+investigate how ARMA will behave in such an instance.
+```armaJoinedDataset.py``` is the main solution to the pca assignment.
+
+```plotting.py``` shows autocorrelation plots.
+
 
 ---
 
