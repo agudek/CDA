@@ -54,7 +54,7 @@ columns = ['L_T1', 'L_T2' ,'L_T3' ,'L_T4' ,'L_T5' ,'L_T6' ,'L_T7' ,'F_PU1',
  'S_PU10' ,'F_PU11', 'S_PU11' ,'F_V2' ,'S_V2', 'P_J280' ,'P_J269', 'P_J300',
  'P_J256' ,'P_J289', 'P_J415' ,'P_J302' ,'P_J306' ,'P_J307', 'P_J317', 'P_J14',
  'P_J422' ,'ATT_FLAG']
-minimum = 0
+minimum = 1
 maximum = 40
 fig = ff.create_annotated_heatmap(correlation[minimum:maximum, minimum:maximum], x=columns[minimum:maximum], y=columns[minimum:maximum])
 fig.layout.title = 'Heatmap of correlation between variables'

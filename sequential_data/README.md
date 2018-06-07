@@ -1,6 +1,10 @@
 Sequential data
 ---
 
+Files ```BATADAL_dataset03, BATADAL_dataset04, BATADAL_test_dataset``` are the training
+sets 1 and 2 and the test sets downloaded from the batadal website and used for this
+assignment.
+
 The visualisations in the report were created using ```dataviz.py``` and ```datavis_attacks.py```
 ```plotting.py``` shows the correlation between columns in the dataset.
 
@@ -18,7 +22,12 @@ investigate how ARMA will behave in such an instance.
 
 ```plotting.py``` shows autocorrelation plots.
 
+Folder ```armaResults``` contains the anomalies, densities and residuals of 7 dataset columns.
 
+File ```aic_min_orders.csv``` contains the best p and q values for each of the 7 columns, with
+the smallest aic values for those columns.
+
+NB: Arma takes  about 4-5 minutes  to run before you see results per column.
 ---
 
 Discretisation and anomaly detection using N-grams was performed in ```discrete_models.py```

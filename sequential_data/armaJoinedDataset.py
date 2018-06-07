@@ -71,27 +71,6 @@ def aic(dataset, columns):
         order_selection = arma_order_select_ic(column.values, max_ar = 4, max_ma = 2, ic = "aic")
         aic_orders[column_name] = order_selection.aic_min_order
     return aic_orders
-'''Calculate statistics for ARMA'''
-# '''Calculate statistics for ARMA'''
-# def overlap_results(attack_flags, predictions, bounds, columns):
-#     true_positive = false_negative = number_of_attacks = 0
-#
-#     for i in range(5, len(attack_flags)):
-#         if int(attack_flags[i]) == 1:
-#             number_of_attacks = number_of_attacks + 1
-#
-#             registered = False
-#             for column in columns:
-#                 lowerbound, upperbound = bounds[column]
-#                 if predictions[column][i] < lowerbound or predictions[column][i] > upperbound:
-#                     true_positive = true_positive + 1
-#                     registered = True
-#                     break
-#             if not registered:
-#                 false_negative = false_negative + 1
-#     print("false_negative = %s " % false_negative)
-#     print("true_positive = %s" % true_positive)
-#     print("number_of_attacks = %s" % number_of_attacks)
 
 '''Load data'''
 train_data1 = pd.read_csv("BATADAL_dataset03.csv", header=0, parse_dates=[0], index_col=None, squeeze=True, date_parser=parser)
@@ -141,6 +120,7 @@ for c in columns:
     bounds[c] = (lowerbound, upperbound)
     mse = mean_squared_error(test_data_values, predictions[c])
     rmse = np.sqrt(mse)
+    print('Test MSE: %.3f for column %s' % (mse, c))
     print('Test RMSE: %.3f for column %s' % (rmse, c))
 
     dates = [x for x in train_data2['DATETIME']]
@@ -151,6 +131,5 @@ for c in columns:
     '''Plot Arma'''
     plot_arma(c, dates, predictions[c], test_data_values, standard_deviation, mean)
     plot_residual(c, train_dates, model_fit.resid)
-    # overlap_results(train_data1['ATT_FLAG'], predictions, bounds, c)
 
 
