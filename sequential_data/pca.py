@@ -6,13 +6,17 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 
+'''Parse time accordingly'''
 def parser(x):
     return datetime.strptime(x, '%d/%m/%y %H')
 
+'''Read the training and test datasets'''
 parsed_train_data1 = pd.read_csv("BATADAL_dataset03.csv", header=0, parse_dates=[0], index_col=0, squeeze=True, date_parser=parser)
 parsed_train_data2 = pd.read_csv("BATADAL_dataset04.csv", header=0, parse_dates=[0], index_col=0, squeeze=True, date_parser=parser)
 parsed_test_data = pd.read_csv("BATADAL_test_dataset.csv", header=0, parse_dates=[0], index_col=0, squeeze=True, date_parser=parser)
 
+'''We set all locations in the test set which are known from the batadal website
+to be attack times to 1 and the rest to -999'''
 def set_attacks(test_set):
     test_set = test_set.assign(ATT_FLAG=np.zeros(test_set.shape[:][0]))
     test_set.loc[:,'ATT_FLAG'] = test_set.loc[:, 'ATT_FLAG'].map({0: -999})
@@ -26,6 +30,8 @@ def set_attacks(test_set):
 
     return test_set
 
+'''Splits data and transforms it for later use in the pca model
+Returns x and y to be used in the pca model'''
 def transform_data(dataset):
     scalar = StandardScaler()
     x = dataset.iloc[:,0:43].values
@@ -34,6 +40,7 @@ def transform_data(dataset):
 
     return x,y
 
+'''Define and run the pca model, plot graphs of spe and print results '''
 def pca_task(pca, t, index, label):
     pca_model = pca.transform(t)
     residual = t - pca.inverse_transform(pca_model)
@@ -47,7 +54,6 @@ def pca_task(pca, t, index, label):
     plt.plot(label.map({-999: -0.1, 0: 0, 1: 1}).values)
     plt.show()
 
-    plt.figure(figsize=[15, 10])
     plt.plot(notanomalous)
     plt.plot(label.map({-999: -0.1, 0: 0, 1: 1}).values)
     plt.show()
@@ -100,9 +106,11 @@ def pca_task(pca, t, index, label):
     print('F1= ' + str(F1))
     print('number of anomalous regions= ' + str(numberOfAnomalousRegions))
 
-
+'''From the batadal test set, we set all attack locations to 1 with attacks and non attack positions
+to -999 as defined in set_attacks method. '''
 test_set = set_attacks(parsed_test_data)
 
+'''Fill all Null or NA values in test and training sets '''
 test_set = test_set.fillna(test_set.median(axis=0))
 training_set1 = parsed_train_data1.fillna(parsed_train_data1.median(axis = 0))
 training_set2 = parsed_train_data2.fillna(parsed_train_data2.median(axis = 0))
@@ -111,9 +119,12 @@ x1, y1 = transform_data(training_set1)
 x2, y2 = transform_data(training_set2)
 z, yz = transform_data(test_set)
 
+'''Fill in Number of pca components and fit the model'''
 pca = PCA(n_components=7)
 pca.fit(x1)
 
-pca_task(pca, x2, training_set1.index, y2)
+'''Call to the pca method above with second training dataset which contains 
+attacks as parameters '''
+pca_task(pca, x2, training_set2.index, y2)
 
 

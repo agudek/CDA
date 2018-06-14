@@ -1,11 +1,4 @@
-# from sklearn.neural_network import MLPClassifier
-# from sklearn.model_selection import train_test_split
-#from sklearn.preprocessing import StandardScaler
-# from sklearn.metrics import accuracy_score, log_loss
-import seaborn as sns
 import matplotlib.pyplot as plt
-from numpy import *
-import numpy as np
 
 import pandas as pd
 
@@ -29,7 +22,6 @@ x = range(len(data[data.columns[0]]))
 for i,col in enumerate(columns):
     axarr[i].plot(x, data[col])
     axarr[i].legend([col],loc=2, prop={'size': 6}, handlelength=1)
-    #axarr[i].axes.get_xaxis().set_visible(False)
     axarr[i].axes.get_yaxis().set_visible(False)
     axarr[i].fill_between(x,data[data.columns[-1]], color=(1,0,0,0.2))
 

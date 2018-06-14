@@ -1,14 +1,10 @@
 from numpy import *
-import numpy as np
-
-from pandas import Series
 import pandas as pd
 
 from sklearn import preprocessing
 from itertools import islice
 
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, precision_recall_curve, auc, roc_auc_score, roc_curve, recall_score, classification_report
 from sklearn.tree import DecisionTreeRegressor
 
 data1 = pd.read_csv("BATADAL_dataset03.csv")
@@ -35,15 +31,12 @@ for col in data1.columns:
 	sliding_window_next=values[range(window_size,len(values))]
 
 	names=range(window_size)
-	#df = pd.DataFrame.from_items(zip(names, sliding_window_data))
 	df = pd.DataFrame(sliding_window_data,columns=names)
 
-	#df['labels']=sliding_window_next
 
 	cf = DecisionTreeRegressor(max_depth=10)
 
 	X = pd.DataFrame.as_matrix(df)
-	#y = df['labels']
 	y =sliding_window_next
 
 	X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.01, random_state=0)
@@ -55,7 +48,7 @@ for col in data1.columns:
 	error_sum = 0
 	squared_error_sum = 0
 	for i,p in enumerate(pred):
-		#print("actual %f predicted %f"%(y_test[i],p))
+		print("actual %f predicted %f"%(y_test[i],p))
 		error_sum=error_sum+(abs(y_test[i]-p))
 		squared_error_sum=squared_error_sum+(pow(y_test[i]-p,2))
 
