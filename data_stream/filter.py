@@ -25,10 +25,11 @@ with open("capture20110818.pcap.netflow.labeled") as file:
 		values[4] = source_ip
 		values.insert(5,source_port)
 
+		values.pop(6)
+
 		values[6] = dest_ip
 		values.insert(7,dest_port)
 
-		values.pop(5)
 		
 		label = values[13]
 
