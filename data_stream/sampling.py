@@ -6,10 +6,13 @@ from sys import getsizeof
 
 infected_host = "147.32.84.165"
 
+# Set reservoir size
 k = 5000
 
+# Define linked list to store top k
 top = llist()
 
+'''Open file and parse'''
 with open("capture20110816.pcap.netflow.labeled") as file:
 	file.readline() # Skip first line
 	start_time = time.time()
@@ -20,6 +23,7 @@ with open("capture20110816.pcap.netflow.labeled") as file:
 		dest_ip_port = values[6].split(":")
 		dest_ip = dest_ip_port[0]
 
+		# Only use if relevant to observed infected host
 		if source_ip==infected_host:
 			other_ip = dest_ip
 		elif dest_ip==infected_host:
@@ -29,6 +33,7 @@ with open("capture20110816.pcap.netflow.labeled") as file:
 
 		val = random()
 
+		# Store k IPs with lowest assigned random values in linked list
 		new_node = top.root
 		while new_node != None:
 			if val<new_node.value:
@@ -44,6 +49,7 @@ with open("capture20110816.pcap.netflow.labeled") as file:
 
 
 distribution = []
+#Group by IP address to obtain occurence count per IP
 for i, g in groupby(sorted(top.aslist(), key=lambda x: x[0]), key=lambda x: x[0]):
 	distribution.append((i, len(list(g))))
 

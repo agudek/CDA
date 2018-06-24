@@ -4,6 +4,7 @@ cols = ["date","time", "duration", "protocol", "source_ip", "source_port", "dest
 
 data = {}
 
+'''Open file and parse'''
 with open("capture20110818.pcap.netflow.labeled") as file:
 	file.readline() # Skip first line
 	i = 0
@@ -33,10 +34,11 @@ with open("capture20110818.pcap.netflow.labeled") as file:
 		
 		label = values[13]
 
+		# Add to dict if not a background flow
 		if label != 'Background':
 			data[i] = dict(zip(cols, values))
 			i+=1
 
-
+# Convert to dataframe and write to csv file
 df = pd.DataFrame.from_dict(data, "index")
 df.to_csv("scenario_10_filtered.csv")

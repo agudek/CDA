@@ -4,9 +4,11 @@ from linkedlist import llist
 import time
 from sys import getsizeof
 
+# Define matrix width and height (hash count)
 w = 250
 d = 3
 
+'''Return list of hash results'''
 def _get_hashes(val):
     h = []
     for i in range(d):
@@ -18,11 +20,12 @@ def _get_hashes(val):
         h.append(h_i)
     return h
 
+'''Increment matrix cells hit by hash values'''
 def sketch(mat, val):
     for i,h in enumerate(_get_hashes(val)):
         mat[h][i] += 1
     
-
+'''Obtain all matrix cells hit by hash values and return minimum value'''
 def get_count(mat, val):
     min_cnt = sys.maxsize
     for i,h in enumerate(_get_hashes(val)):
@@ -31,6 +34,8 @@ def get_count(mat, val):
     return min_cnt
 
 infected_host = "147.32.84.165"
+
+# Define matrix to store counts
 mat = []
 for i in range(w):
     mat.append([0]*d)
@@ -38,6 +43,7 @@ for i in range(w):
 top = llist()
 
 n=0
+'''Open file and parse'''
 with open("capture20110816.pcap.netflow.labeled") as file:
     file.readline() # Skip first line
     start_time = time.time()
@@ -48,6 +54,7 @@ with open("capture20110816.pcap.netflow.labeled") as file:
         dest_ip_port = values[6].split(":")
         dest_ip = dest_ip_port[0]
 
+        # Only use IP if relevant to observed IP
         if source_ip==infected_host:
             n+=1
             other_ip = dest_ip
@@ -57,10 +64,14 @@ with open("capture20110816.pcap.netflow.labeled") as file:
         else:
             continue
 
+        # Increment count
         sketch(mat, bytes(other_ip,'utf-8'))
 
+        # Immediately get count result for IP
+        # This allows finding top 10 in one pass
         val = get_count(mat, bytes(other_ip,'utf-8'))
 
+        # Store top 10 in linked list
         new_node = top.root
         while new_node != None:
             if val>=new_node.value:
@@ -81,7 +92,6 @@ with open("capture20110816.pcap.netflow.labeled") as file:
 
 print("--- %d bytes ---"%(getsizeof(top)+getsizeof(mat)))
 print("--- %s seconds ---\n" % (time.time() - start_time))
-
 
 new_node = top.root
 print("sketch (w=%d, d=%d)"%(w,d))

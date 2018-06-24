@@ -8,6 +8,7 @@ df = pd.read_csv('scenario_10_filtered.csv')
 cols = ['bytes','packets']
 df['label'] = df['label'].map({"LEGITIMATE": 0, "Botnet": 1})
 
+'''Define split values (obtained by observing the data)'''
 cutoffs = [(0,0.05),(0.05,0.1),(0.1,0.2),(0.2,0.4),(0.4,1.001)]
 cutoffs.reverse()
 
@@ -42,6 +43,6 @@ for i,col in enumerate(cols):
 
 plt.show()
 
-'''Create new dataset'''
+'''Create new discretised dataset and write to csv file'''
 df['combined_discretisation'] = df['bytes'].astype(str)+df['packets'].astype(str)
 df.to_csv('scenario_10_discretised.csv')
